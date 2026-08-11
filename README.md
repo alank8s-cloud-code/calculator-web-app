@@ -1,52 +1,100 @@
-# Python Calculator — Flask Web Application
+# Python Calculator — Flask + Docker
 
-A simple web-based calculator built with **Python and Flask**.
+A web-based calculator application built with **Python and Flask**, designed to run both locally and inside a **Docker container**.
 
-The application provides a browser-based UI for performing basic arithmetic operations and runs on **port 5000**.
-
----
-
-## Project Overview
-
-This project demonstrates how a Python application can be converted from a command-line program into a web application.
-
-The application uses:
-
-* **Python** — Application logic
-* **Flask** — Web framework
-* **HTML** — Web page structure
-* **CSS** — Web page styling
-* **Jinja2** — Dynamic HTML rendering
-* **Virtual Environment** — Dependency isolation
+The application provides a browser-based UI for basic arithmetic operations and runs on **port 5000**.
 
 ---
 
-# Project Architecture
+# Project Overview
+
+This project demonstrates the complete journey of a Python web application:
 
 ```text
+Python Application
+       ↓
+Flask Web Framework
+       ↓
+HTML + CSS UI
+       ↓
+Run Locally
+       ↓
+Dockerfile
+       ↓
+Docker Image
+       ↓
+Docker Container
+       ↓
 Browser
-   │
-   │ http://localhost:5000
-   ▼
-┌─────────────────────┐
-│       Flask         │
-│       app.py        │
-└──────────┬──────────┘
-           │
-           ├──────────────► Calculator Logic
-           │
-           ▼
-┌─────────────────────┐
-│ templates/index.html│
-│       HTML UI       │
-└──────────┬──────────┘
-           │
-           │ loads
-           ▼
-┌─────────────────────┐
-│ static/style.css    │
-│       CSS           │
-└─────────────────────┘
+```
+
+---
+
+# What, Why, How?
+
+## What?
+
+This is a Flask-based calculator application that allows users to perform:
+
+* Addition
+* Subtraction
+* Multiplication
+* Division
+
+It includes input validation and division-by-zero handling.
+
+The application can run:
+
+1. Directly with Python
+2. Inside a Docker container
+
+---
+
+## Why?
+
+This project helps understand the complete lifecycle of a Python application before moving into production-style DevOps workflows.
+
+You learn:
+
+* Python application structure
+* Flask
+* HTTP requests
+* HTML forms
+* CSS
+* Flask templates
+* Static files
+* Python dependencies
+* Virtual environments
+* Docker images
+* Docker containers
+* Port mapping
+
+---
+
+## How?
+
+The application is developed and tested locally first:
+
+```text
+Python
+  ↓
+Flask
+  ↓
+localhost:5000
+```
+
+After confirming that it works, it is packaged into a Docker image:
+
+```text
+Python Application
+       ↓
+   Dockerfile
+       ↓
+   Docker Image
+       ↓
+Docker Container
+       ↓
+localhost:5000
 ```
 
 ---
@@ -60,6 +108,7 @@ python-calculator/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
+├── Dockerfile
 │
 ├── templates/
 │   └── index.html
@@ -70,27 +119,67 @@ python-calculator/
 
 ---
 
-# What, Why, How?
+# Application Architecture
 
-## 1. `app.py`
+```text
+                         Browser
+                            │
+                            │ HTTP
+                            ▼
+                   http://localhost:5000
+                            │
+                            ▼
+                    ┌──────────────┐
+                    │    Flask     │
+                    │    app.py    │
+                    └──────┬───────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+              ▼                         ▼
+      Calculator Logic          render_template()
+              │                         │
+              │                         ▼
+              │                templates/index.html
+              │                         │
+              │                         ▼
+              │                  static/style.css
+              │                         │
+              └────────────┬────────────┘
+                           ▼
+                         Result
+```
+
+---
+
+# Application Components
+
+## `app.py`
 
 ### What?
 
-`app.py` is the main Python application.
+The main Python application.
 
 ### Why?
 
-It contains the Flask server, routes, request handling, calculator logic, and error handling.
+It contains:
+
+* Flask configuration
+* Routes
+* Calculator logic
+* Form handling
+* Error handling
+* Port configuration
 
 ### How?
 
-Flask is initialized with:
+The Flask application is created with:
 
 ```python
 app = Flask(__name__)
 ```
 
-The application is started on port 5000:
+The application runs on port `5000`:
 
 ```python
 app.run(host="0.0.0.0", port=5000, debug=True)
@@ -98,41 +187,45 @@ app.run(host="0.0.0.0", port=5000, debug=True)
 
 ---
 
-## 2. `templates/index.html`
+# `templates/index.html`
 
 ### What?
 
-`index.html` is the calculator's web interface.
+The calculator's HTML interface.
 
 ### Why?
 
-Users need a browser-based interface to enter numbers and select operations.
+It provides the UI where users enter numbers and select operations.
 
 ### How?
 
-Flask renders the HTML using:
+Flask renders it using:
 
 ```python
 render_template("index.html")
 ```
 
-Flask automatically looks for HTML templates inside the `templates/` directory.
+Flask automatically searches for templates inside:
+
+```text
+templates/
+```
 
 ---
 
-## 3. `static/style.css`
+# `static/style.css`
 
 ### What?
 
-`style.css` contains the application's visual styling.
+The CSS file that controls the appearance of the calculator.
 
 ### Why?
 
-HTML provides the structure, while CSS controls the appearance.
+HTML provides structure while CSS provides styling.
 
 ### How?
 
-The HTML connects to the CSS using:
+The HTML connects to CSS using:
 
 ```html
 <link
@@ -141,74 +234,159 @@ The HTML connects to the CSS using:
 >
 ```
 
-Flask serves the CSS from:
+Flask serves:
+
+```text
+/static/style.css
+```
+
+from:
 
 ```text
 static/style.css
 ```
 
-The browser then applies the CSS to the HTML.
-
 ---
 
-# How HTML Connects to CSS
+# `requirements.txt`
 
-The connection works like this:
+### What?
 
-```text
-Browser requests /
-       │
-       ▼
-Flask
-       │
-       ▼
-templates/index.html
-       │
-       │ Browser sees:
-       │ /static/style.css
-       ▼
-Browser requests CSS
-       │
-       ▼
-Flask serves
-static/style.css
-       │
-       ▼
-Browser combines
-HTML + CSS
-       │
-       ▼
-Styled Calculator
+A list of Python dependencies required by the application.
+
+### Why?
+
+It allows the same dependencies to be installed consistently on another machine or inside Docker.
+
+### How?
+
+Install dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+For this project, Flask is the main external dependency.
+
+Check the installed Flask version:
+
+```bash
+python -m flask --version
+```
+
+You can regenerate the requirements file with:
+
+```bash
+python -m pip freeze > requirements.txt
 ```
 
 ---
 
-# Features
+# `.gitignore`
 
-The calculator supports:
+The `.gitignore` prevents unnecessary or sensitive files from being committed.
 
-* Addition
-* Subtraction
-* Multiplication
-* Division
-* Decimal numbers
-* Input validation
-* Division-by-zero handling
-* Invalid operation handling
-* Browser-based UI
-* Responsive layout
-* Flask web server
+Example:
+
+```gitignore
+.venv/
+venv/
+env/
+
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+
+.vscode/
+.idea/
+
+*.log
+
+.DS_Store
+Thumbs.db
+```
 
 ---
 
-# Calculator Operations
+# Flask Request Flow
 
-| Operation      | Symbol | Example  | Result |
-| -------------- | ------ | -------- | -----: |
-| Addition       | `+`    | `10 + 5` |   `15` |
-| Subtraction    | `-`    | `10 - 5` |    `5` |
-| Multiplication | `×`    | `10 × 5` |   `50` |
-| Division       | `÷`    | `10 ÷ 5` |    `2` |
+When the user opens:
+
+```text
+http://localhost:5000
+```
+
+the browser sends:
+
+```text
+GET /
+```
+
+Flask receives the request:
+
+```text
+GET /
+  ↓
+@app.route("/")
+  ↓
+index()
+  ↓
+render_template()
+  ↓
+index.html
+```
+
+The browser then displays the calculator.
+
+---
+
+# Calculator Request Flow
+
+When the user submits:
+
+```text
+First Number: 10
+Second Number: 5
+Operation: Addition
+```
+
+the browser sends:
+
+```text
+POST /
+```
+
+with:
+
+```text
+num1=10
+num2=5
+operation=add
+```
+
+Flask receives the values:
+
+```python
+num1 = float(request.form["num1"])
+num2 = float(request.form["num2"])
+operation = request.form["operation"]
+```
+
+Then:
+
+```text
+request.form
+     ↓
+calculate()
+     ↓
+result
+     ↓
+index.html
+     ↓
+Browser
+```
 
 ---
 
@@ -216,16 +394,22 @@ The calculator supports:
 
 ## Division by Zero
 
-The application checks for division by zero:
+The application checks:
 
 ```python
 if num2 == 0:
     raise ValueError("Cannot divide by zero.")
 ```
 
-Instead of crashing, the application displays an error message.
+Therefore:
 
-Example:
+```text
+10 ÷ 0
+```
+
+does not crash the application.
+
+Instead, the user receives:
 
 ```text
 Error
@@ -234,60 +418,11 @@ Cannot divide by zero.
 
 ---
 
-## Invalid Input
+# Local Python Setup
 
-The application converts user input into numbers:
+Before Dockerizing the application, make sure it works directly with Python.
 
-```python
-num1 = float(request.form["num1"])
-```
-
-Invalid values are caught and handled using:
-
-```python
-try:
-    ...
-except ValueError:
-    ...
-```
-
-This prevents invalid user input from crashing the application.
-
----
-
-# Requirements
-
-The project requires:
-
-* Python 3
-* Flask
-
-Dependencies are stored in:
-
-```text
-requirements.txt
-```
-
-Install them using:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Local Setup
-
-## Step 1 — Clone the repository
-
-```bash
-git clone <your-repository-url>
-cd python-calculator
-```
-
----
-
-## Step 2 — Create a virtual environment
+## Step 1 — Create virtual environment
 
 ```bash
 python3 -m venv .venv
@@ -295,7 +430,7 @@ python3 -m venv .venv
 
 ---
 
-## Step 3 — Activate the virtual environment
+## Step 2 — Activate virtual environment
 
 ### Linux/macOS
 
@@ -311,10 +446,18 @@ source .venv/bin/activate
 
 ---
 
-## Step 4 — Install dependencies
+## Step 3 — Install dependencies
 
 ```bash
 pip install -r requirements.txt
+```
+
+---
+
+## Step 4 — Check Flask
+
+```bash
+python -m flask --version
 ```
 
 ---
@@ -325,7 +468,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The Flask server will start on:
+The application should run on:
 
 ```text
 http://localhost:5000
@@ -333,256 +476,673 @@ http://localhost:5000
 
 ---
 
-# Access the Application
+# Test the Local Application
 
-Open your browser and visit:
-
-```text
-http://localhost:5000
-```
-
-You should see the Python Calculator UI.
-
----
-
-# Application Request Flow
-
-When the user opens the application:
-
-```text
-Browser
-   │
-   │ GET /
-   ▼
-Flask
-   │
-   ▼
-index()
-   │
-   ▼
-render_template()
-   │
-   ▼
-index.html
-   │
-   ▼
-Browser
-```
-
-When the user submits a calculation:
-
-```text
-Browser
-   │
-   │ POST /
-   │
-   │ num1
-   │ num2
-   │ operation
-   ▼
-Flask
-   │
-   ▼
-request.form
-   │
-   ▼
-calculate()
-   │
-   ▼
-Result
-   │
-   ▼
-index.html
-   │
-   ▼
-Browser
-```
-
----
-
-# CSS Request Flow
-
-The browser receives:
-
-```html
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}"
->
-```
-
-Flask generates the static file URL:
-
-```text
-/static/style.css
-```
-
-The browser requests it:
-
-```text
-GET /static/style.css
-```
-
-Flask serves:
-
-```text
-static/style.css
-```
-
-The browser applies the CSS to the HTML.
-
----
-
-# Useful Commands
-
-### Check Python version
-
-```bash
-python3 --version
-```
-
-### Create virtual environment
-
-```bash
-python3 -m venv .venv
-```
-
-### Activate virtual environment
-
-```bash
-source .venv/bin/activate
-```
-
-### Install Flask
-
-```bash
-pip install flask
-```
-
-### Generate requirements
-
-```bash
-pip freeze > requirements.txt
-```
-
-### Install requirements
-
-```bash
-pip install -r requirements.txt
-```
-
-### Run application
-
-```bash
-python app.py
-```
-
-### Check Git status
-
-```bash
-git status
-```
-
----
-
-# Git Workflow
-
-Initialize Git:
-
-```bash
-git init
-```
-
-Add files:
-
-```bash
-git add .
-```
-
-Create the first commit:
-
-```bash
-git commit -m "Build Flask calculator application"
-```
-
-Connect your GitHub repository:
-
-```bash
-git remote add origin <your-repository-url>
-```
-
-Push:
-
-```bash
-git branch -M main
-git push -u origin main
-```
-
----
-
-# Learning Outcomes
-
-After completing this project, you should understand:
-
-* How a Python application runs
-* How Flask works
-* How routes work
-* Difference between GET and POST
-* How HTML forms send data to Flask
-* How `request.form` works
-* How Python processes user input
-* How calculator logic is separated from request handling
-* How errors are handled
-* How Flask serves HTML
-* How Flask serves CSS
-* How `templates/` works
-* How `static/` works
-* How a browser communicates with a Python backend
-* How to run a Flask application on port 5000
-* How Python dependencies are managed with `requirements.txt`
-* How Git tracks the project
-
----
-
-# Next Step — Dockerization
-
-After confirming that the application works locally:
-
-```bash
-python app.py
-```
-
-and is accessible at:
+Open:
 
 ```text
 http://localhost:5000
 ```
 
-the next DevOps step is to containerize it.
-
-The Docker workflow will be:
+Test:
 
 ```text
-Python Application
-       │
-       ▼
-requirements.txt
-       │
-       ▼
+10 + 5
+10 - 5
+10 × 5
+10 ÷ 5
+10 ÷ 0
+```
+
+Also test invalid input.
+
+The application should continue running when invalid input is provided.
+
+---
+
+# Dockerization
+
+Once the application works correctly with Python, we can package it using Docker.
+
+The Docker workflow is:
+
+```text
+              Python Source Code
+                      │
+                      ▼
+                 Dockerfile
+                      │
+                      ▼
+                docker build
+                      │
+                      ▼
+                Docker Image
+                      │
+                      ▼
+                 docker run
+                      │
+                      ▼
+              Docker Container
+                      │
+                      ▼
+                Flask :5000
+                      │
+                      ▼
+            http://localhost:5000
+```
+
+---
+
+# Dockerfile
+
+Create a file named:
+
+```text
 Dockerfile
-       │
-       ▼
-Docker Image
-       │
-       ▼
-Docker Container
-       │
-       ▼
-Flask :5000
-       │
-       ▼
-Browser
 ```
 
-> **Important:** Dockerization should come after the application works correctly in the native Python environment.
+Example:
+
+```dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+```
+
+---
+
+# Dockerfile — What, Why, How?
+
+## `FROM`
+
+```dockerfile
+FROM python:3.12-slim
+```
+
+### What?
+
+Selects the base image.
+
+### Why?
+
+Our application needs Python.
+
+### How?
+
+Docker starts from a Python 3.12 slim image.
+
+---
+
+## `WORKDIR`
+
+```dockerfile
+WORKDIR /app
+```
+
+### What?
+
+Sets the working directory inside the container.
+
+### Why?
+
+It gives the application a predictable location.
+
+Inside the container:
+
+```text
+/app
+```
+
+becomes the project directory.
+
+---
+
+## `COPY requirements.txt`
+
+```dockerfile
+COPY requirements.txt .
+```
+
+### What?
+
+Copies the dependency file into the image.
+
+### Why?
+
+We need the dependencies before running the application.
+
+---
+
+## `RUN pip install`
+
+```dockerfile
+RUN pip install --no-cache-dir -r requirements.txt
+```
+
+### What?
+
+Installs Python dependencies.
+
+### Why?
+
+The container needs Flask to run the application.
+
+---
+
+## `COPY . .`
+
+```dockerfile
+COPY . .
+```
+
+### What?
+
+Copies the project files into the container.
+
+### Why?
+
+The container needs:
+
+```text
+app.py
+templates/
+static/
+```
+
+---
+
+## `EXPOSE`
+
+```dockerfile
+EXPOSE 5000
+```
+
+### What?
+
+Documents that the application listens on port `5000`.
+
+### Why?
+
+It communicates the intended application port.
+
+> `EXPOSE` alone does **not** publish the port to your host machine.
+
+---
+
+## `CMD`
+
+```dockerfile
+CMD ["python", "app.py"]
+```
+
+### What?
+
+Defines the default command executed when the container starts.
+
+### Why?
+
+It starts the Flask application.
+
+---
+
+# Build the Docker Image
+
+From the project directory:
+
+```bash
+docker build -t python-calculator .
+```
+
+### What happens?
+
+```text
+Dockerfile
+    ↓
+docker build
+    ↓
+Base Python Image
+    ↓
+Install Flask
+    ↓
+Copy Application
+    ↓
+Python Calculator Image
+```
+
+Check the image:
+
+```bash
+docker images
+```
+
+You should see:
+
+```text
+python-calculator
+```
+
+---
+
+# Run the Docker Container
+
+Run:
+
+```bash
+docker run -d -p 5000:5000 --name python-calculator python-calculator
+```
+
+Now open:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Understanding `-p 5000:5000`
+
+This is one of the most important Docker concepts.
+
+```bash
+-p 5000:5000
+```
+
+means:
+
+```text
+HOST PORT : CONTAINER PORT
+```
+
+Therefore:
+
+```text
+5000 : 5000
+```
+
+means:
+
+```text
+Your Computer
+localhost:5000
+      │
+      │ Docker port mapping
+      ▼
+Container
+port 5000
+      │
+      ▼
+Flask
+```
+
+So when you visit:
+
+```text
+http://localhost:5000
+```
+
+the request reaches Flask inside the container.
+
+---
+
+# Why `host="0.0.0.0"` Matters
+
+Our Flask application uses:
+
+```python
+app.run(host="0.0.0.0", port=5000)
+```
+
+This is especially important inside Docker.
+
+If Flask only listens on:
+
+```text
+127.0.0.1
+```
+
+inside the container, external traffic may not be able to reach it correctly.
+
+Using:
+
+```text
+0.0.0.0
+```
+
+allows Flask to listen on the container's network interfaces.
+
+The complete connection becomes:
+
+```text
+Browser
+   │
+   │ localhost:5000
+   ▼
+Host Machine :5000
+   │
+   │ -p 5000:5000
+   ▼
+Container :5000
+   │
+   ▼
+Flask 0.0.0.0:5000
+   │
+   ▼
+Python Application
+```
+
+---
+
+# Check Running Containers
+
+```bash
+docker ps
+```
+
+You should see:
+
+```text
+python-calculator
+```
+
+---
+
+# View Container Logs
+
+```bash
+docker logs python-calculator
+```
+
+This is useful for checking whether Flask started successfully.
+
+You should see something similar to:
+
+```text
+* Running on http://127.0.0.1:5000
+* Running on http://172.x.x.x:5000
+```
+
+---
+
+# Stop the Container
+
+```bash
+docker stop python-calculator
+```
+
+---
+
+# Start the Existing Container Again
+
+```bash
+docker start python-calculator
+```
+
+---
+
+# Remove the Container
+
+Stop it first:
+
+```bash
+docker stop python-calculator
+```
+
+Then:
+
+```bash
+docker rm python-calculator
+```
+
+---
+
+# Run Container in Foreground
+
+For development and debugging, you can run:
+
+```bash
+docker run --rm -p 5000:5000 --name python-calculator python-calculator
+```
+
+The logs will appear directly in your terminal.
+
+Press:
+
+```text
+Ctrl + C
+```
+
+to stop it.
+
+---
+
+# Run Container in Background
+
+For normal usage:
+
+```bash
+docker run -d \
+    -p 5000:5000 \
+    --name python-calculator \
+    python-calculator
+```
+
+Check:
+
+```bash
+docker ps
+```
+
+Then visit:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Docker Commands Cheat Sheet
+
+## Build
+
+```bash
+docker build -t python-calculator .
+```
+
+## Run
+
+```bash
+docker run -d -p 5000:5000 --name python-calculator python-calculator
+```
+
+## List images
+
+```bash
+docker images
+```
+
+## List running containers
+
+```bash
+docker ps
+```
+
+## List all containers
+
+```bash
+docker ps -a
+```
+
+## View logs
+
+```bash
+docker logs python-calculator
+```
+
+## Stop
+
+```bash
+docker stop python-calculator
+```
+
+## Start
+
+```bash
+docker start python-calculator
+```
+
+## Remove container
+
+```bash
+docker rm python-calculator
+```
+
+## Remove image
+
+```bash
+docker rmi python-calculator
+```
+
+---
+
+# Complete Development Workflow
+
+The recommended workflow is:
+
+```text
+┌──────────────────────┐
+│ 1. Write Python Code │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 2. Build Flask UI    │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 3. Test Locally      │
+│ python app.py        │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 4. Create Dockerfile │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 5. Build Image       │
+│ docker build         │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 6. Run Container     │
+│ docker run           │
+└──────────┬───────────┘
+           ↓
+┌──────────────────────┐
+│ 7. Test Browser      │
+│ localhost:5000       │
+└──────────────────────┘
+```
+
+---
+
+# Final Architecture
+
+After Dockerization:
+
+```text
+                         HOST MACHINE
+                              │
+                              │
+                    localhost:5000
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │     Docker      │
+                    │    Container    │
+                    │                 │
+                    │  Flask :5000    │
+                    │       │         │
+                    │       ▼         │
+                    │    app.py       │
+                    │       │         │
+                    │       ├── templates/
+                    │       │     └── index.html
+                    │       │
+                    │       └── static/
+                    │             └── style.css
+                    │                 │
+                    └─────────────────┘
+                              │
+                              ▼
+                           Browser
+```
+
+---
+
+# Final Checklist
+
+Before considering the project complete:
+
+* [ ] Python application works
+* [ ] Flask installed
+* [ ] `requirements.txt` created
+* [ ] HTML UI works
+* [ ] CSS loads correctly
+* [ ] Calculator operations work
+* [ ] Division by zero is handled
+* [ ] `.gitignore` exists
+* [ ] `README.md` exists
+* [ ] Dockerfile exists
+* [ ] Docker image builds successfully
+* [ ] Docker container starts successfully
+* [ ] Port `5000` is mapped
+* [ ] Application works at `http://localhost:5000`
+* [ ] Container logs show Flask running
+
+---
+
+# Key DevOps Lesson
+
+The application has two different environments:
+
+### Local Python
+
+```text
+Your Machine
+    ↓
+Python
+    ↓
+Flask
+    ↓
+localhost:5000
+```
+
+### Docker
+
+```text
+Your Machine
+    ↓
+Docker
+    ↓
+Container
+    ↓
+Python
+    ↓
+Flask
+    ↓
+localhost:5000
+```
+
+The **application code remains the same**.
+
+Docker provides a consistent environment in which that application runs.
 
