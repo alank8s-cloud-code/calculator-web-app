@@ -1,0 +1,53 @@
+# -------- Stage 1 : Builder --------------
+
+FROM python:3.12-alpine AS builder
+
+# Set the working directory
+
+WORKDIR /app
+
+# Copy the dependency
+
+COPY requirements.txt .
+
+# Install the Dependency
+
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt --target=/app/lib
+
+# Copy the all files
+
+COPY . .
+
+# -------- Stage 2 : Deployer --------------
+
+FROM gcr.io/distroless/python3-debian12:nonroot
+
+# Set the working directory
+
+WORKDIR /app
+
+# Copy the dependency
+
+COPY --from=builder /app/lib /app/lib
+
+COPY --from=builder /app/templates /app/templates
+
+COPY --from=builder /app/static /app/static
+
+COPY --from=builder /app/app.py .
+
+# Set the env
+
+ENV PYTHONPATH=/app/lib
+
+# Force python logs to appear instantly
+
+ENV PYTHONUNBUFFERED=1
+
+# Expose the Port
+
+EXPOSE 5000
+ 
+# Run the application
+
+CMD ["app.py"]
